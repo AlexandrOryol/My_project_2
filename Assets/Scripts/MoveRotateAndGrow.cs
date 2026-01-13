@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class MoveRotateAndGrow : MonoBehaviour
 {
-    public float MoveSpeed = 5f;
+    public float MoveSpeed = 10f;
     public float RotationSpeed = 60f;
     public float ScaleSpeed = 0.3f;
     
