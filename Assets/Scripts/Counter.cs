@@ -1,33 +1,51 @@
+using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class Counter : MonoBehaviour
 {
+    public event Action<int> CountChanged;
+    public event Action CountingStarted;
+    public event Action CountingStopped;
+    
     [Header("Настройка счетчика")]
     [SerializeField] private float _interval = 0.5f;
-    [SerializeField] private bool _startOnAwake = false;
 
     [Header("Текущее состояние")]
-    [SerializeField] private int _currentCount = 0;
+    [SerializeField] private int _currentValue = 0;
     [SerializeField] private bool _isCounting = false;
 
     private Coroutine _countingCoroutine;
+    private WaitForSeconds _waitInterval;
 
-    public int CurrentCount => _currentCount;
+    public int CurrentValue => _currentValue;
     public bool IsCounting => _isCounting;
-
-    private void Start()
+    
+    private void Awake()
     {
-        if (_startOnAwake)
-            StartCounting();
+        _waitInterval = new WaitForSeconds(_interval);
     }
-
-    private void Update()
+    
+    private void OnEnable()
     {
-        if (Input.GetMouseButtonDown(0))
-            ToggleCounting();
+        var inputReader = FindObjectOfType<InputReader>();
+        
+        if(inputReader != null)
+        {
+            inputReader.MouseLeftClicked += ToggleCounting;
+            inputReader.ResetKeyPressed += ResetCounter;
+        }
+    }
+    
+    private void OnDisable()
+    {
+        var inputReader = FindObjectOfType<InputReader>();
+        
+        if(inputReader != null)
+        {
+            inputReader.MouseLeftClicked -= ToggleCounting;
+            inputReader.ResetKeyPressed -= ResetCounter;
+        }
     }
 
     public void ToggleCounting()
@@ -45,8 +63,8 @@ public class Counter : MonoBehaviour
 
         _isCounting = true;
         _countingCoroutine = StartCoroutine(CountingRoutine());
-
-        Debug.Log($"Счетчик запущен. Текущее значение: {_currentCount}");
+        
+        CountingStarted?.Invoke();
     }
 
     public void StopCounting()
@@ -62,29 +80,25 @@ public class Counter : MonoBehaviour
             _countingCoroutine = null;
         }
         
-        Debug.Log($"Счетчик остановлен. Итоговое значение: {_currentCount}");
+        CountingStopped?.Invoke();
     }
 
     private IEnumerator CountingRoutine()
     {
         while(_isCounting)
         {
-            yield return new WaitForSeconds(_interval);
+            yield return _waitInterval;
 
-            _currentCount++;
-            Debug.Log($"Счетчик: {_currentCount}");
+            _currentValue++;
 
-            OnCountChanged?.Invoke(_currentCount);
+            CountChanged?.Invoke(_currentValue);
         }
     }
 
     public void ResetCounter()
     {
-        _currentCount = 0;
-        Debug.Log("Счетчик сброшен до 0");
+        _currentValue = 0;
 
-        OnCountChanged?.Invoke(_currentCount);
+        CountChanged?.Invoke(_currentValue);
     }
-
-    public event System.Action<int> OnCountChanged;
 }
