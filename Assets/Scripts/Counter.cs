@@ -4,51 +4,76 @@ using UnityEngine;
 
 public class Counter : MonoBehaviour
 {
-    public event Action<int> CountChanged;
-    public event Action CountingStarted;
-    public event Action CountingStopped;
-    
-    [Header("Настройка счетчика")]
-    [SerializeField] private float _interval = 0.5f;
+    [Header("Settings")]
+    [SerializeField] private float _countingInterval = 0.5f;
 
-    [Header("Текущее состояние")]
-    [SerializeField] private int _currentValue = 0;
-    [SerializeField] private bool _isCounting = false;
+    [Header("State")]
+    [SerializeField] private int _currentCount;
+    [SerializeField] private bool _isCounting;
 
     private Coroutine _countingCoroutine;
-    private WaitForSeconds _waitInterval;
+    private InputReader _inputReader;
 
-    public int CurrentValue => _currentValue;
+    public event Action<int> CountChanged;
+
+    public int CurrentCount => _currentCount;
     public bool IsCounting => _isCounting;
-    
+
     private void Awake()
     {
-        _waitInterval = new WaitForSeconds(_interval);
+        _inputReader = FindObjectOfType<InputReader>();
+
+        ValidateDependencies();
     }
-    
+
     private void OnEnable()
     {
-        var inputReader = FindObjectOfType<InputReader>();
-        
-        if(inputReader != null)
-        {
-            inputReader.MouseLeftClicked += ToggleCounting;
-            inputReader.ResetKeyPressed += ResetCounter;
-        }
+        SubscribeToInputEvents();
     }
-    
+
     private void OnDisable()
     {
-        var inputReader = FindObjectOfType<InputReader>();
-        
-        if(inputReader != null)
+        UnsubscribeFromInputEvents();
+        StopCountingInternal();
+    }
+
+    private void ValidateDependencies()
+    {
+        if (_inputReader == null)
         {
-            inputReader.MouseLeftClicked -= ToggleCounting;
-            inputReader.ResetKeyPressed -= ResetCounter;
+            Debug.LogError($"{nameof(Counter)}: {nameof(InputReader)} component not found in scene!");
         }
     }
 
-    public void ToggleCounting()
+    private void SubscribeToInputEvents()
+    {
+        if (_inputReader == null)
+            return;
+
+        _inputReader.MouseLeftClicked += HandleMouseClick;
+        _inputReader.ResetKeyPressed += HandleResetKey;
+    }
+
+    private void UnsubscribeFromInputEvents()
+    {
+        if (_inputReader == null)
+            return;
+
+        _inputReader.MouseLeftClicked -= HandleMouseClick;
+        _inputReader.ResetKeyPressed -= HandleResetKey;
+    }
+
+    private void HandleMouseClick()
+    {
+        ToggleCountingState();
+    }
+
+    private void HandleResetKey()
+    {
+        ResetCount();
+    }
+
+    public void ToggleCountingState()
     {
         if (_isCounting)
             StopCounting();
@@ -58,47 +83,81 @@ public class Counter : MonoBehaviour
 
     public void StartCounting()
     {
-        if(_isCounting)
+        if (_isCounting)
             return;
 
         _isCounting = true;
-        _countingCoroutine = StartCoroutine(CountingRoutine());
-        
-        CountingStarted?.Invoke();
+        _countingCoroutine = StartCoroutine(CountingProcess());
+
+        NotifyCountChanged();
     }
 
     public void StopCounting()
     {
-        if(!_isCounting)
+        if (!_isCounting)
             return;
 
+        StopCountingInternal();
+
+        NotifyCountChanged();
+    }
+
+    private void StopCountingInternal()
+    {
         _isCounting = false;
 
-        if( _countingCoroutine != null)
+        if (_countingCoroutine != null)
         {
             StopCoroutine(_countingCoroutine);
             _countingCoroutine = null;
         }
-        
-        CountingStopped?.Invoke();
     }
 
-    private IEnumerator CountingRoutine()
+    private IEnumerator CountingProcess()
     {
-        while(_isCounting)
+        var waitInterval = new WaitForSeconds(_countingInterval);
+
+        while (_isCounting)
         {
-            yield return _waitInterval;
-
-            _currentValue++;
-
-            CountChanged?.Invoke(_currentValue);
+            yield return waitInterval;
+            IncrementCount();
         }
     }
 
-    public void ResetCounter()
+    private void IncrementCount()
     {
-        _currentValue = 0;
+        _currentCount++;
+        NotifyCountChanged();
+        LogCountUpdate();
+    }
 
-        CountChanged?.Invoke(_currentValue);
+    private void NotifyCountChanged()
+    {
+        CountChanged?.Invoke(_currentCount);
+    }
+
+    private void LogCountUpdate()
+    {
+        Debug.Log($"Counter: {_currentCount}");
+    }
+
+    public void ResetCount()
+    {
+        _currentCount = 0;
+
+        NotifyCountChanged();
+    }
+
+    public void SetCount(int value)
+    {
+        if (value < 0)
+        {
+            Debug.LogWarning($"Attempt to set negative count: {value}");
+            return;
+        }
+
+        _currentCount = value;
+
+        NotifyCountChanged();
     }
 }

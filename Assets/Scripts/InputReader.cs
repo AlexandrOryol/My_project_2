@@ -1,10 +1,10 @@
+using System;
 using UnityEngine;
-using UnityEngine.Events;
 
 public class InputReader : MonoBehaviour
 {
-    public event UnityAction MouseLeftClicked;
-    public event UnityAction ResetKeyPressed;
+    public event Action MouseLeftClicked;
+    public event Action ResetKeyPressed;
 
     private void Update()
     {
