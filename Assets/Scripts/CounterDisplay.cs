@@ -15,11 +15,6 @@ public class CounterDisplay : MonoBehaviour
     [SerializeField] private string _statusFormat = "STATUS: {0}";
     [SerializeField] private Color _countingColor = Color.green;
     [SerializeField] private Color _stoppedColor = Color.red;
-    
-    private void OnValidate()
-    {
-        FindCounterIfNull();
-    }
 
     private void Awake()
     {
@@ -37,22 +32,17 @@ public class CounterDisplay : MonoBehaviour
         UnsubscribeFromCounterEvents();
     }
 
-    private void FindCounterIfNull()
-    {
-        if (_counter == null)
-            _counter = FindObjectOfType<Counter>();
-    }
-
     private void ValidateReferences()
     {
         if(_counter == null)
         {
-            Debug.LogError($"{nameof(CounterDisplay)}: Counter reference is missing");
+            Debug.LogError($"{nameof(CounterDisplay)}: Counter reference is not set in the inspector");
+            enabled = false;
         }
 
         if(_countText == null)
         {
-            Debug.LogError($"{nameof(CounterDisplay)}: Count text reference is missing");
+            Debug.LogError($"{nameof(CounterDisplay)}: Count text reference is not set in the inspector");
         }
     }
 

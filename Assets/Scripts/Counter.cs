@@ -7,22 +7,27 @@ public class Counter : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private float _countingInterval = 0.5f;
 
-    [Header("State")]
-    [SerializeField] private int _currentCount;
-    [SerializeField] private bool _isCounting;
+    [Header("Dependencies")]
+    [SerializeField] private InputReader _inputReader;
+
+    private int _currentCount;
+    private bool _isCounting;
 
     private Coroutine _countingCoroutine;
-    private InputReader _inputReader;
 
     public event Action<int> CountChanged;
 
     public int CurrentCount => _currentCount;
     public bool IsCounting => _isCounting;
 
+    private void OnValidate()
+    {
+        if(_inputReader == null)
+            _inputReader = GetComponent<InputReader>();
+    }
+
     private void Awake()
     {
-        _inputReader = FindObjectOfType<InputReader>();
-
         ValidateDependencies();
     }
 
@@ -42,6 +47,7 @@ public class Counter : MonoBehaviour
         if (_inputReader == null)
         {
             Debug.LogError($"{nameof(Counter)}: {nameof(InputReader)} component not found in scene!");
+            enabled = false;
         }
     }
 

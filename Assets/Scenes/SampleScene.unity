@@ -131,7 +131,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 153408489}
-  - component: {fileID: 153408488}
+  - component: {fileID: 153408490}
   m_Layer: 0
   m_Name: InputReader
   m_TagString: Untagged
@@ -139,18 +139,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &153408488
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 153408487}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da01641123a704c43bb82a2f75f635d6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &153408489
 Transform:
   m_ObjectHideFlags: 0
@@ -166,6 +154,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &153408490
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 153408487}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da01641123a704c43bb82a2f75f635d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &433070533
 GameObject:
   m_ObjectHideFlags: 0
@@ -210,8 +210,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c630ce11f7c40ae4b8462f5cb80d45a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interval: 0.5
-  _currentValue: 0
+  _countingInterval: 0.5
+  _currentCount: 0
   _isCounting: 0
 --- !u!1 &705507993
 GameObject:
@@ -559,7 +559,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u0421\u0422\u0410\u0422\u0423\u0421: \u041E\u0421\u0422\u0410\u041D\u041E\u0412\u041B\u0415\u041D\u041E"
+  m_text: 'STATUS: STOPPED'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -671,7 +671,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -16.5, y: 0}
+  m_AnchoredPosition: {x: -81.3, y: 0}
   m_SizeDelta: {x: 300, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1141503212
@@ -694,7 +694,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u0417\u043D\u0430\u0447\u0435\u043D\u0438\u0435: 0"
+  m_text: 'VALUE: 0'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -780,19 +780,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 1141503209}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 23a87c5c91ae6454db3f6fabf25d2d94, type: 3}
+  m_Script: {fileID: 11500000, guid: 62e87103c6edeca46a5dea20f047a40e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _counter: {fileID: 433070536}
-  _inputReader: {fileID: 153408488}
-  _valueText: {fileID: 1141503212}
+  _countText: {fileID: 1141503212}
   _statusText: {fileID: 980920463}
-  _valueFormat: "\u0417\u043D\u0430\u0447\u0435\u043D\u0438\u0435: {0}"
-  _statusFormat: "\u0421\u0422\u0410\u0422\u0423\u0421: {0}"
+  _countFormat: 'Value: {0}'
+  _statusFormat: 'STATUS: {0}'
   _countingColor: {r: 0, g: 1, b: 0, a: 1}
   _stoppedColor: {r: 1, g: 0, b: 0, a: 1}
-  _pulseScale: 1.1
-  _pulseDuration: 0.2
 --- !u!1 &1927889768
 GameObject:
   m_ObjectHideFlags: 0
