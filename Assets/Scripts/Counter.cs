@@ -2,17 +2,16 @@ using System;
 using System.Collections;
 using UnityEngine;
 
+[RequireComponent(typeof(InputReader))]
+
 public class Counter : MonoBehaviour
 {
     [Header("Settings")]
-    [SerializeField] private float _countingInterval = 0.5f;
+    [SerializeField, Min(0.01f)] private float _countingInterval = 0.5f;
 
-    [Header("Dependencies")]
-    [SerializeField] private InputReader _inputReader;
-
+    private InputReader _inputReader;
     private int _currentCount;
     private bool _isCounting;
-
     private Coroutine _countingCoroutine;
 
     public event Action<int> CountChanged;
@@ -20,66 +19,7 @@ public class Counter : MonoBehaviour
     public int CurrentCount => _currentCount;
     public bool IsCounting => _isCounting;
 
-    private void OnValidate()
-    {
-        if(_inputReader == null)
-            _inputReader = GetComponent<InputReader>();
-    }
-
-    private void Awake()
-    {
-        ValidateDependencies();
-    }
-
-    private void OnEnable()
-    {
-        SubscribeToInputEvents();
-    }
-
-    private void OnDisable()
-    {
-        UnsubscribeFromInputEvents();
-        StopCountingInternal();
-    }
-
-    private void ValidateDependencies()
-    {
-        if (_inputReader == null)
-        {
-            Debug.LogError($"{nameof(Counter)}: {nameof(InputReader)} component not found in scene!");
-            enabled = false;
-        }
-    }
-
-    private void SubscribeToInputEvents()
-    {
-        if (_inputReader == null)
-            return;
-
-        _inputReader.MouseLeftClicked += HandleMouseClick;
-        _inputReader.ResetKeyPressed += HandleResetKey;
-    }
-
-    private void UnsubscribeFromInputEvents()
-    {
-        if (_inputReader == null)
-            return;
-
-        _inputReader.MouseLeftClicked -= HandleMouseClick;
-        _inputReader.ResetKeyPressed -= HandleResetKey;
-    }
-
-    private void HandleMouseClick()
-    {
-        ToggleCountingState();
-    }
-
-    private void HandleResetKey()
-    {
-        ResetCount();
-    }
-
-    public void ToggleCountingState()
+    public void ToggleCounting()
     {
         if (_isCounting)
             StopCounting();
@@ -106,6 +46,72 @@ public class Counter : MonoBehaviour
         StopCountingInternal();
 
         NotifyCountChanged();
+    }
+
+    public void ResetCount()
+    {
+        _currentCount = 0;
+
+        NotifyCountChanged();
+    }
+
+    public void SetCount(int value)
+    {
+        if (value < 0)
+        {
+            Debug.LogWarning($"Attempt to set negative count: {value}");
+            return;
+        }
+
+        _currentCount = value;
+
+        NotifyCountChanged();
+    }
+
+    private void Awake()
+    {
+        _inputReader = GetComponent<InputReader>();
+
+        ValidateDependencies();
+    }
+
+    private void OnEnable()
+    {
+        SubscribeToInputEvents();
+    }
+
+    private void OnDisable()
+    {
+        UnsubscribeFromInputEvents();
+        StopCountingInternal();
+    }
+
+    private void ValidateDependencies()
+    {
+        if (_inputReader == null)
+        {
+            Debug.LogError($"{nameof(Counter)}: {nameof(InputReader)} component is missing!" +
+                $"Attach {nameof(InputReader)} component to the same GameObject.");
+            enabled = false;
+        }
+    }
+
+    private void SubscribeToInputEvents()
+    {
+        if (_inputReader == null)
+            return;
+
+        _inputReader.ToggleCountingRequested += ToggleCounting;
+        _inputReader.ResetRequested += ResetCount;
+    }
+
+    private void UnsubscribeFromInputEvents()
+    {
+        if (_inputReader == null)
+            return;
+
+        _inputReader.ToggleCountingRequested -= ToggleCounting;
+        _inputReader.ResetRequested -= ResetCount;
     }
 
     private void StopCountingInternal()
@@ -145,25 +151,5 @@ public class Counter : MonoBehaviour
     private void LogCountUpdate()
     {
         Debug.Log($"Counter: {_currentCount}");
-    }
-
-    public void ResetCount()
-    {
-        _currentCount = 0;
-
-        NotifyCountChanged();
-    }
-
-    public void SetCount(int value)
-    {
-        if (value < 0)
-        {
-            Debug.LogWarning($"Attempt to set negative count: {value}");
-            return;
-        }
-
-        _currentCount = value;
-
-        NotifyCountChanged();
     }
 }

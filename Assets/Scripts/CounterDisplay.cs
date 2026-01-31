@@ -36,13 +36,14 @@ public class CounterDisplay : MonoBehaviour
     {
         if(_counter == null)
         {
-            Debug.LogError($"{nameof(CounterDisplay)}: Counter reference is not set in the inspector");
+            Debug.LogError($"{nameof(CounterDisplay)}: Counter reference is mandatory" +
+                $"Assign in inspector or ensure Counter component exists in scene.");
             enabled = false;
         }
 
         if(_countText == null)
         {
-            Debug.LogError($"{nameof(CounterDisplay)}: Count text reference is not set in the inspector");
+            Debug.LogError($"{nameof(CounterDisplay)}: Count text reference is required.");
         }
     }
 

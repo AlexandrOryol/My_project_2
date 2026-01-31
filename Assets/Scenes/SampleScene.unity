@@ -166,6 +166,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da01641123a704c43bb82a2f75f635d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _mouseButton: 0
+  _resetKey: 114
+  _logInputEvents: 0
 --- !u!1 &433070533
 GameObject:
   m_ObjectHideFlags: 0
@@ -211,8 +214,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _countingInterval: 0.5
-  _currentCount: 0
-  _isCounting: 0
+  _inputReader: {fileID: 153408490}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
