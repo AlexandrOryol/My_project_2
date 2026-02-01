@@ -6,7 +6,7 @@ public class InputReader : MonoBehaviour
     [Header("Input Settings")]
     [SerializeField, Range(0, 2)] private int _toggleMouseButton = 0;
     [SerializeField] private KeyCode _resetKey = KeyCode.R;
-    [SerializeField] private bool _logInputEvents = false;
+    [SerializeField] private bool _isLogginInputEvents = false;
 
     public event Action ToggleCountingRequested;
     public event Action ResetRequested;
@@ -23,8 +23,8 @@ public class InputReader : MonoBehaviour
         {
             ToggleCountingRequested?.Invoke();
 
-            if (_logInputEvents)
-                Debug.Log($"[InputReader] Mouse button {_toggleMouseButton} clicked");
+            if (_isLogginInputEvents)
+                Debug.Log($"[InputReader] Toggle counting requested via mouse button {_toggleMouseButton}.");
         }
     }
 
@@ -34,8 +34,8 @@ public class InputReader : MonoBehaviour
         {
             ResetRequested?.Invoke();
 
-            if (_logInputEvents)
-                Debug.Log($"[InputReader] {_resetKey} key pressed");
+            if (_isLogginInputEvents)
+                Debug.Log($"[InputReader] Reset requested via {_resetKey} key.");
         }
     }
 }

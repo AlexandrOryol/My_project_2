@@ -24,7 +24,7 @@ public class CounterDisplay : MonoBehaviour
     private void OnEnable()
     {
         SubscribeToCounterEvents();
-        UpdateDisplay();
+        UpdateDisplay(_counter.CurrentCount, _counter.IsCounting);
     }
     
     private void OnDisable()
@@ -65,28 +65,25 @@ public class CounterDisplay : MonoBehaviour
 
     private void HandleCountChanged(int count)
     {
-        UpdateDisplay();
+        UpdateDisplay(count, _counter.IsCounting);
     }
     
-    private void UpdateDisplay()
+    private void UpdateDisplay(int count, bool isCounting)
     {
-        if (_counter == null)
-            return;
-
-        UpdateCountDisplay();
-        UpdateStatusDisplay();
+        UpdateCountDisplay(count);
+        UpdateStatusDisplay(isCounting);
     }
     
-    private void UpdateCountDisplay()
+    private void UpdateCountDisplay(int count)
     {
         if(_countText == null)
             return;
             
-        _countText.text = string.Format(_countFormat, _counter.CurrentCount);
+        _countText.text = string.Format(_countFormat, count);
         _countText.color = _counter.IsCounting ? _countingColor : _stoppedColor;
     }   
     
-    private void UpdateStatusDisplay()
+    private void UpdateStatusDisplay(bool isCounting)
     {
         if(_statusText == null)
             return;

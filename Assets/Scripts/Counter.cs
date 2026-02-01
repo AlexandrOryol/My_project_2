@@ -19,55 +19,6 @@ public class Counter : MonoBehaviour
     public int CurrentCount => _currentCount;
     public bool IsCounting => _isCounting;
 
-    public void ToggleCounting()
-    {
-        if (_isCounting)
-            StopCounting();
-        else
-            StartCounting();
-    }
-
-    public void StartCounting()
-    {
-        if (_isCounting)
-            return;
-
-        _isCounting = true;
-        _countingCoroutine = StartCoroutine(CountingProcess());
-
-        NotifyCountChanged();
-    }
-
-    public void StopCounting()
-    {
-        if (!_isCounting)
-            return;
-
-        StopCountingInternal();
-
-        NotifyCountChanged();
-    }
-
-    public void ResetCount()
-    {
-        _currentCount = 0;
-
-        NotifyCountChanged();
-    }
-
-    public void SetCount(int value)
-    {
-        if (value < 0)
-        {
-            Debug.LogWarning($"Attempt to set negative count: {value}");
-            return;
-        }
-
-        _currentCount = value;
-
-        NotifyCountChanged();
-    }
-
     private void Awake()
     {
         _inputReader = GetComponent<InputReader>();
@@ -86,6 +37,26 @@ public class Counter : MonoBehaviour
         StopCountingInternal();
     }
 
+    public void ResetCount()
+    {
+        _currentCount = 0;
+
+        CountChanged?.Invoke(_currentCount);
+    }
+
+    public void SetCount(int value)
+    {
+        if (value < 0)
+        {
+            Debug.LogWarning($"Attempt to set negative count: {value}");
+            return;
+        }
+
+        _currentCount = value;
+
+        CountChanged?.Invoke(_currentCount);
+    }
+
     private void ValidateDependencies()
     {
         if (_inputReader == null)
@@ -101,8 +72,8 @@ public class Counter : MonoBehaviour
         if (_inputReader == null)
             return;
 
-        _inputReader.ToggleCountingRequested += ToggleCounting;
-        _inputReader.ResetRequested += ResetCount;
+        _inputReader.ToggleCountingRequested += HandleToggleCountingRequested;
+        _inputReader.ResetRequested += HandleResetRequested;
     }
 
     private void UnsubscribeFromInputEvents()
@@ -110,8 +81,42 @@ public class Counter : MonoBehaviour
         if (_inputReader == null)
             return;
 
-        _inputReader.ToggleCountingRequested -= ToggleCounting;
-        _inputReader.ResetRequested -= ResetCount;
+        _inputReader.ToggleCountingRequested -= HandleToggleCountingRequested;
+        _inputReader.ResetRequested -= HandleResetRequested;
+    }
+
+    private void HandleToggleCountingRequested()
+    {
+        if(_isCounting)
+            HandleStopCounting();
+        else
+            HandleStartCounting();
+    }
+
+    private void HandleResetRequested()
+    {
+        ResetCount();
+    }
+
+    private void HandleStartCounting()
+    {
+        if (_isCounting)
+            return;
+
+        _isCounting = true;
+        _countingCoroutine = StartCoroutine(CountingProcess());
+
+        CountChanged?.Invoke(_currentCount);
+    }
+
+    private void HandleStopCounting()
+    {
+        if (!_isCounting)
+            return;
+
+        StopCountingInternal();
+
+        CountChanged?.Invoke(_currentCount);
     }
 
     private void StopCountingInternal()
@@ -132,24 +137,8 @@ public class Counter : MonoBehaviour
         while (_isCounting)
         {
             yield return waitInterval;
-            IncrementCount();
+            _currentCount++;
+            CountChanged?.Invoke(_currentCount);
         }
-    }
-
-    private void IncrementCount()
-    {
-        _currentCount++;
-        NotifyCountChanged();
-        LogCountUpdate();
-    }
-
-    private void NotifyCountChanged()
-    {
-        CountChanged?.Invoke(_currentCount);
-    }
-
-    private void LogCountUpdate()
-    {
-        Debug.Log($"Counter: {_currentCount}");
     }
 }
