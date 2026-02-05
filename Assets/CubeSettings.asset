@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff2eb650372bec94d98c4c8a77bebd8a, type: 3}
+  m_Name: CubeSettings
+  m_EditorClassIdentifier: 
+  _minSplitCount: 2
+  _maxSplitCount: 6
+  _initialScale: 1
+  _scaleReductionFactor: 0.5
+  _minScale: 0.1
+  _explosionForce: 10
+  _explosionRadius: 5
+  _explosionForceMode: 1
+  _initialSplitChance: 1
+  _splitChanceReduction: 0.5
+  _boundarySize: 20
